@@ -1,0 +1,49 @@
+.tools {
+  padding: 4rem 0;
+  overflow: hidden;
+}
+
+.tools-marquee {
+  overflow: hidden;
+}
+
+.tools-track {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  width: max-content;
+  animation: marquee-scroll 20s linear infinite;
+}
+
+.tools-icon {
+  display: flex;
+  font-size: 32px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* warna asli tiap brand, menggantikan var(--text-secondary) di atas */
+.tools-icon--python { color: #3776ab; }
+.tools-icon--js { color: #f7df1e; }
+.tools-icon--html5 { color: #e34f26; }
+.tools-icon--css3 { color: #1572b6; }
+.tools-icon--git { color: #f05032; }
+.tools-icon--docker { color: #2496ed; }
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 768px) {
+  /* batas marquee disamakan dengan .container: max-width + margin auto + padding yang sama */
+  .tools-marquee {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 clamp(1.5rem, 5vw, 2rem);
+  }
+}
