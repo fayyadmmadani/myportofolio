@@ -17,18 +17,16 @@
 
 .tools-icon {
   display: flex;
-  font-size: 32px;
-  color: var(--text-secondary);
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-/* warna asli tiap brand, menggantikan var(--text-secondary) di atas */
-.tools-icon--python { color: #3776ab; }
-.tools-icon--js { color: #f7df1e; }
-.tools-icon--html5 { color: #e34f26; }
-.tools-icon--css3 { color: #1572b6; }
-.tools-icon--git { color: #f05032; }
-.tools-icon--docker { color: #2496ed; }
+.tools-icon-img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
 
 @keyframes marquee-scroll {
   from {
@@ -40,7 +38,6 @@
 }
 
 @media (min-width: 768px) {
-  /* batas marquee disamakan dengan .container: max-width + margin auto + padding yang sama */
   .tools-marquee {
     max-width: 960px;
     margin: 0 auto;
