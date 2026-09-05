@@ -1,0 +1,58 @@
+.experience {
+  padding: 4rem 0;
+}
+
+.section-title {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  margin-bottom: 2rem;
+}
+
+.experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.experience-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.experience-year {
+  font-family: monospace;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+.experience-role {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.experience-org {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.experience-desc {
+  color: var(--text-secondary);
+}
+
+@media (min-width: 768px) {
+  .experience-item {
+    flex-direction: row;
+    gap: 3rem;
+  }
+
+  .experience-year {
+    flex: 0 0 120px;
+  }
+
+  .experience-details {
+    flex: 1;
+  }
+}
