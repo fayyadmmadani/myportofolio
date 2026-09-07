@@ -78,3 +78,4 @@ Strategi Prompting:
 
 - Diskusi terkait perencanaan pengembangan, seperti arsitektur kode yang baik (terutama untuk skalabilitas), tag, selector, dan atribut yang bisa digunakan sesuai konteks yang akan diimplementasi, serta evaluasi terhadap kode yang sudah dibuat
 - Bagian spesifik yang dibantu: bagaimana implementasi kode yang modular pada django, konten foto profile berbeda posisi pada mobile dan desktop. atribut-atribut yang digunakan untuk kebutuhan spesifik, misal: clamp() untuk mengunci elemen terhadap layar yang dinamis pada browser.
+- Diskusi conventional commits untuk berbagai kondisi (feat, docs, chore, fix, dll)
