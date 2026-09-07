@@ -1,126 +1,141 @@
-.hero {
-    padding: 4.5rem 0 5rem;
+/* ===== Default = mobile ===== */
+
+.about {
+  padding: 6rem 0 4rem;
 }
 
-.hero-grid {
+.about-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.about-info {
+  display: contents;
+  text-align: center;
+}
+
+.about-kicker {
+  order: 1;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.about-name {
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  line-height: 1.05;
+  margin-bottom: 0.75rem;
+}
+
+.about-npm {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.about-bio {
+  color: var(--text-secondary);
+  max-width: 480px;
+}
+
+.about-photo {
+  order: 2;
+  position: relative;
+  max-width: 320px;
+  align-self: center;
+}
+
+.about-photo-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.about-photo-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  filter: grayscale(1);
+  object-position: center 55%;
+}
+
+.about-photo-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--accent);
+  mix-blend-mode: color;
+  opacity: 0.4;
+
+  -webkit-mask-image: url("/static/img/profile-photo.webp");
+  -webkit-mask-size: cover;
+  -webkit-mask-position: center;
+  mask-image: url("/static/img/profile-photo.webp");
+  mask-size: cover;
+  mask-position: center;
+}
+
+.about-badge {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+  z-index: 2;
+}
+
+.about-badge--github {
+  top: -12px;
+  left: -12px;
+}
+
+.about-badge--linkedin {
+  bottom: -12px;
+  right: -12px;
+}
+
+.about-badge--github:hover {
+  color: #fff;
+  background-color: #0a66c2;
+}
+
+.about-badge--linkedin:hover {
+  color: #fff;
+  background-color: #0a66c2;
+}
+
+.about-text {
+  order: 3;
+}
+
+/* ===== Enhance = desktop ===== */
+@media (min-width: 768px) {
+  .about-grid {
     display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    grid-template-areas:
-        "identity photo"
-        "details  photo";
-    gap: 1.5rem 3rem;
-}
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    column-gap: 10rem;
+  }
 
-.hero-identity {
-    grid-area: identity;
-}
-
-.hero-details {
-    grid-area: details;
-}
-
-.hero-kicker {
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent-dark);
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-}
-
-.hero-identity h1 {
-    font-size: clamp(3rem, 7vw, 5rem);
-    line-height: 0.95;
-}
-
-.bio {
-    color: var(--text-muted);
-    max-width: 480px;
-    margin-bottom: 1.5rem;
-}
-
-.meta-list {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-}
-
-.meta-row dt {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    margin-bottom: 0.15rem;
-}
-
-.meta-row dd {
-    font-weight: 600;
-}
-
-.social-links {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.social-link {
-    display: inline-block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--paper);
-    background-color: var(--ink);
-    border-radius: var(--radius);
-    padding: 0.5rem 1.1rem;
-    transition: background-color 0.2s ease;
-}
-
-.social-link:hover {
-    background-color: var(--accent);
-}
-
-.hero-photo {
-    grid-area: photo;
-    align-self: center;
-    position: relative;
-}
-
-.photo-block {
-    position: absolute;
-    top: 1.25rem;
-    left: 1.25rem;
-    width: 100%;
-    height: 100%;
-    background-color: var(--accent);
-    border-radius: var(--radius);
-    z-index: 0;
-}
-
-.avatar {
-    position: relative;
-    z-index: 1;
+  .about-info {
     display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 3px solid var(--ink);
-}
+    text-align: left;
+  }
 
-@media (max-width: 600px) {
-    .hero-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "identity"
-            "photo"
-            "details";
-    }
-
-    .hero-photo {
-        max-width: 220px;
-    }
-
-    .social-links {
-        justify-content: flex-start;
-    }
+  .about-photo {
+    max-width: 360px;
+    justify-self: end;
+  }
 }

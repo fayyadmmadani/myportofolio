@@ -1,0 +1,46 @@
+.tools {
+  padding: 4rem 0;
+  overflow: hidden;
+}
+
+.tools-marquee {
+  overflow: hidden;
+}
+
+.tools-track {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  width: max-content;
+  animation: marquee-scroll 20s linear infinite;
+}
+
+.tools-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tools-icon-img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 768px) {
+  .tools-marquee {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 clamp(1.5rem, 5vw, 2rem);
+  }
+}

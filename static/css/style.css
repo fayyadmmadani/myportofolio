@@ -12,32 +12,34 @@
 }
 
 :root {
-  --ink: #1c1917;
-  --paper: #faf6f0;
-  --accent: #d95d39;
-  --accent-dark: #a8442a;
-  --line: #e3d9c9;
-  --text-muted: #6b6459;
-  --radius: 4px;
+  --bg: #0f1115;
+  --text: #e4e4e7;
+  --text-secondary: #71717a;
+  --accent: #2f6fed;
+  --border: #26282e;
+
+  --font-heading: "Satoshi", -apple-system, sans-serif;
+  --font-body: "Inter", -apple-system, sans-serif;
 }
 
 body {
-  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: var(--ink);
-  background-color: var(--paper);
+  font-family: var(--font-body);
+  color: var(--text);
+  background-color: var(--bg);
   line-height: 1.6;
 }
 
 h1,
 .brand {
-  font-family:
-    "Space Grotesk",
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-heading);
 }
 
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 clamp(1.5rem, 5vw, 2rem);
+}
+
+main {
+  padding-top: 50px;
 }
