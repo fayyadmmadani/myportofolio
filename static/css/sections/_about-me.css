@@ -11,7 +11,7 @@
 }
 
 .about-info {
-  display: contents; /* "bongkar" wrapper ini, anak-anaknya jadi flex item langsung */
+  display: contents;
   text-align: center;
 }
 
@@ -124,18 +124,18 @@
 @media (min-width: 768px) {
   .about-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* dikecilin dari 1.3fr, lihat catatan ukuran di bawah */
+    grid-template-columns: 1fr 1fr;
     align-items: center;
     column-gap: 10rem;
   }
 
   .about-info {
-    display: block; /* balik jadi satu kotak utuh, bukan dibongkar lagi */
+    display: block;
     text-align: left;
   }
 
   .about-photo {
-    max-width: 360px; /* dikasih batas eksplisit, nggak lagi "none" */
+    max-width: 360px;
     justify-self: end;
   }
 }

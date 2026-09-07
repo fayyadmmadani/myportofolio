@@ -32,7 +32,7 @@
 }
 
 .hamburger {
-  display: flex; /* default-nya kelihatan, karena default = mobile */
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
   width: 24px;
@@ -49,7 +49,7 @@
 }
 
 .nav-links-wrapper {
-  display: none; /* default-nya nyembunyi, dropdown */
+  display: none;
   position: absolute;
   top: 100%;
   left: 0;
@@ -85,12 +85,12 @@
 /* ===== Enhance = desktop ===== */
 @media (min-width: 768px) {
   .hamburger {
-    display: none; /* mobile-only, disembunyikan di desktop */
+    display: none;
   }
 
   .nav-links-wrapper {
-    display: block; /* selalu tampil di desktop, nggak nunggu checkbox */
-    position: static; /* lepas dari absolute, balik ke alur normal */
+    display: block;
+    position: static;
     width: auto;
     background: none;
     border: none;
