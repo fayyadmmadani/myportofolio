@@ -1,9 +1,10 @@
 @import url(components/_navbar.css);
 @import url(components/_footer.css);
-@import url(sections/_about-me.css);
-@import url(sections/_experience.css);
-@import url(sections/_projects.css);
-@import url(sections/_tools.css);
+@import url(landing/_about-me.css);
+@import url(landing/_experience.css);
+@import url(landing/_projects.css);
+@import url(landing/_tools.css);
+@import url(experience/_experience.css);
 
 * {
   margin: 0;
