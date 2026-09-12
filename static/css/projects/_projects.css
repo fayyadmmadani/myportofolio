@@ -1,0 +1,43 @@
+.projects-section {
+  padding: 4rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.projects-section h1 {
+  margin: 0.4rem 0 1.5rem;
+  font-size: 2rem;
+}
+
+.projects-collection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.project-entry {
+  background-color: #161920;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.project-thumbnail {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.project-entry-body {
+  padding: 1.25rem;
+}
+
+.project-entry-body h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.project-description {
+  color: var(--text-secondary);
+}
