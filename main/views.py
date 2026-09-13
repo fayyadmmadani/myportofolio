@@ -1,7 +1,7 @@
 from django.db.models import F
 from django.shortcuts import render
 
-from main.models import Experience
+from main.models import Experience, Project
 
 
 def show_main(request):
@@ -18,6 +18,7 @@ def show_main(request):
         "experience_list": Experience.objects.all().order_by(
             F("ended_at").desc(nulls_first=True), "-started_at"
         )[:2],
+        "project_list": Project.objects.all().order_by("-order", "-created_at")[:2],
     }
     return render(request, "index.html", context)
 
@@ -30,3 +31,11 @@ def show_experience(request):
         ),
     }
     return render(request, "experience.html", context)
+
+
+def show_projects(request):
+    context = {
+        "name": "Fayyad Mohammad Madani",
+        "project_list": Project.objects.all().order_by("-order", "-created_at"),
+    }
+    return render(request, "projects.html", context)
