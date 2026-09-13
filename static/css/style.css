@@ -6,6 +6,7 @@
 @import url(landing/_tools.css);
 @import url(experience/_experience.css);
 @import url(projects/_projects.css);
+@import url(error/_404.css);
 
 * {
   margin: 0;
