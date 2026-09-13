@@ -1,3 +1,4 @@
+from django.db.models import F
 from django.shortcuts import render
 
 from main.models import Experience
@@ -14,6 +15,9 @@ def show_main(request):
           collaboration, and critical thinking — always curious, from interface
           design to web development."""
         ),
+        "experience_list": Experience.objects.all().order_by(
+            F("ended_at").desc(nulls_first=True), "-started_at"
+        )[:2],
     }
     return render(request, "index.html", context)
 
@@ -21,6 +25,8 @@ def show_main(request):
 def show_experience(request):
     context = {
         "name": "Fayyad Mohammad Madani",
-        "experience_list": Experience.objects.all(),
+        "experience_list": Experience.objects.all().order_by(
+            F("ended_at").desc(nulls_first=True), "-started_at"
+        ),
     }
     return render(request, "experience.html", context)
