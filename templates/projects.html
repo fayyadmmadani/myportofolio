@@ -27,7 +27,6 @@
     <main>
       <section class="projects-section" id="projects">
         <div class="container">
-          <p class="section-kicker">Karya yang pernah saya buat</p>
           <h1>Projects</h1>
 
           <div class="projects-collection">
@@ -40,6 +39,10 @@
                     class="project-thumbnail"
                     loading="lazy"
                   />
+                {% else %}
+                  <div class="project-thumbnail project-thumbnail--placeholder">
+                    <i class="fa-solid fa-code"></i>
+                  </div>
                 {% endif %}
                 <div class="project-entry-body">
                   <h2>{{ project.title }}</h2>

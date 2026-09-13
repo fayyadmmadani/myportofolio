@@ -2,32 +2,31 @@
   <div class="container">
     <h2 class="section-title">Projects</h2>
 
-    <div class="projects-grid">
-      <article class="project-card">
-        <div class="project-media">
-          <img
-            src="/static/img/project-1.webp"
-            alt="Nama Project 1"
-            loading="lazy"
-          />
-          <div class="project-overlay">
-            <h3 class="project-title">Portofolio Website</h3>
-            <p class="project-desc"></p>
+    <div class="projects-collection">
+      {% for project in project_list %}
+        <article class="project-entry">
+          {% if project.thumbnail %}
+            <img
+              src="{{ project.thumbnail }}"
+              alt="{{ project.title }}"
+              class="project-thumbnail"
+              loading="lazy"
+            />
+          {% else %}
+            <div class="project-thumbnail project-thumbnail--placeholder">
+              <i class="fa-solid fa-code"></i>
+            </div>
+          {% endif %}
+          <div class="project-entry-body">
+            <h2>{{ project.title }}</h2>
+            <p class="project-description">{{ project.description }}</p>
           </div>
-        </div>
-      </article>
-
-      <article class="project-card">
-        <div class="project-media project-media--placeholder">
-          <span class="project-placeholder-text">Coming Soon!</span>
-        </div>
-      </article>
-
-      <article class="project-card">
-        <div class="project-media project-media--placeholder">
-          <span class="project-placeholder-text">Coming Soon!</span>
-        </div>
-      </article>
+        </article>
+      {% empty %}
+        <p class="empty-state">Belum ada proyek yang ditambahkan.</p>
+      {% endfor %}
     </div>
+
+    <a href="{% url 'main:show_projects' %}" class="btn-small">Lihat Semua Projects</a>
   </div>
 </section>

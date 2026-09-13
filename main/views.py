@@ -14,6 +14,7 @@ def show_main(request):
           collaboration, and critical thinking — always curious, from interface
           design to web development."""
         ),
+        "project_list": Project.objects.all().order_by("-order", "-created_at")[:2],
     }
     return render(request, "index.html", context)
 
@@ -29,6 +30,6 @@ def show_experience(request):
 def show_projects(request):
     context = {
         "name": "Fayyad Mohammad Madani",
-        "project_list": Project.objects.all(),
+        "project_list": Project.objects.all().order_by("-order", "-created_at"),
     }
     return render(request, "projects.html", context)
