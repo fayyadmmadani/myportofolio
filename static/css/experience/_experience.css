@@ -1,0 +1,79 @@
+.experience-section {
+  padding: 4rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.section-kicker {
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.experience-section h1 {
+  margin: 0.4rem 0 1.5rem;
+  font-size: 2rem;
+}
+
+.experience-collection {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-left: 2rem;
+}
+
+.experience-collection::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 2px;
+  background-color: var(--accent);
+}
+
+.experience-entry {
+  position: relative;
+  padding: 1.25rem;
+  background-color: #161920;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.experience-entry::before {
+  content: "";
+  position: absolute;
+  top: 1.5rem;
+  left: -2rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: 3px solid var(--bg);
+}
+
+.experience-category {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.experience-entry h2 {
+  margin: 0.5rem 0;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.experience-description,
+.empty-state {
+  color: var(--text-secondary);
+}
+
+.experience-status {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}

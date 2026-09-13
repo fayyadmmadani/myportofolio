@@ -1,0 +1,8 @@
+.experience {
+  padding: 4rem 0;
+}
+
+.section-title {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  margin-bottom: 2rem;
+}

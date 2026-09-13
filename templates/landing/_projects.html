@@ -1,0 +1,32 @@
+<section class="projects" id="projects">
+  <div class="container">
+    <h2 class="section-title">Projects</h2>
+
+    <div class="projects-collection">
+      {% for project in project_list %}
+        <article class="project-entry">
+          {% if project.thumbnail %}
+            <img
+              src="{{ project.thumbnail }}"
+              alt="{{ project.title }}"
+              class="project-thumbnail"
+              loading="lazy"
+            />
+          {% else %}
+            <div class="project-thumbnail project-thumbnail--placeholder">
+              <i class="fa-solid fa-code"></i>
+            </div>
+          {% endif %}
+          <div class="project-entry-body">
+            <h2>{{ project.title }}</h2>
+            <p class="project-description">{{ project.description }}</p>
+          </div>
+        </article>
+      {% empty %}
+        <p class="empty-state">Belum ada proyek yang ditambahkan.</p>
+      {% endfor %}
+    </div>
+
+    <a href="{% url 'main:show_projects' %}" class="btn-small">Lihat Semua Projects</a>
+  </div>
+</section>

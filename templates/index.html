@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fayyad - Portfolio</title>
+    <title>Portfolio - {{ name }}</title>
     <meta property="og:title" content="Fayyad Mohammad Madani - Portfolio" />
     <meta
       property="og:description"
@@ -39,10 +39,10 @@
   <body>
     {% include "components/_navbar.html" %}
     <main>
-      {% include "sections/_about-me.html" %}
-      {% include "sections/_experience.html" %}
-      {% include "sections/_projects.html" %}
-      {% include "sections/_tools.html" %}
+      {% include "landing/_about-me.html" %}
+      {% include "landing/_experience.html" %}
+      {% include "landing/_projects.html" %}
+      {% include "landing/_tools.html" %}
     </main>
     {% include "components/_footer.html" %}
   </body>

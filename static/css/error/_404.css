@@ -1,0 +1,30 @@
+main.not-found {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0;
+}
+
+.not-found-content {
+  text-align: center;
+}
+
+.not-found-code {
+  font-family: var(--font-heading);
+  font-size: clamp(4rem, 15vw, 8rem);
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.not-found-content h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.not-found-message {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
