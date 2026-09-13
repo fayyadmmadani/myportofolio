@@ -5,6 +5,7 @@
 @import url(landing/_projects.css);
 @import url(landing/_tools.css);
 @import url(experience/_experience.css);
+@import url(projects/_projects.css);
 
 * {
   margin: 0;
@@ -43,4 +44,25 @@ h1,
 
 main {
   padding-top: 50px;
+}
+
+.btn-small {
+  display: block;
+  width: fit-content;
+  margin-top: 2rem;
+  margin-inline: auto;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-small:hover,
+.btn-small:focus-visible {
+  background-color: var(--accent);
+  color: var(--bg);
 }
