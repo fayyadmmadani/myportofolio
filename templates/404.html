@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block meta %}
+  <title>404 - Page Not Found</title>
+{% endblock meta %}
+
+{% block content %}
+<main class="not-found">
+      <div class="container not-found-content">
+        <p class="not-found-code">404</p>
+        <h1>Page Not Found</h1>
+        <p class="not-found-message">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <a href="{% url 'main:show_main' %}" class="btn-small">Back to the Home Page</a>
+      </div>
+    </main>
+{% endblock content %}
