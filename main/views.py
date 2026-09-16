@@ -1,6 +1,7 @@
 from django.db.models import F
 from django.shortcuts import render
 
+from django.conf import settings
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -69,10 +70,14 @@ def get_projects_json(request):
 def create_project(request):
     form = ProjectForm(request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Proyek baru berhasil ditambahkan!")
-        return redirect("main:show_projects")
+    if request.method == "POST":
+        if request.POST.get("secret") != settings.EDIT_SECRET:
+            messages.error(request, "Password salah!")
+            return redirect("main:show_projects")
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Proyek baru berhasil ditambahkan!")
+            return redirect("main:show_projects")
 
     context = {
         "name": "Fayyad Mohammad Madani",
@@ -84,6 +89,9 @@ def delete_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 
     if request.method == "POST":
+        if request.POST.get("secret") != settings.EDIT_SECRET:
+            messages.error(request, "Password salah!")
+            return redirect("main:show_projects")
         project.delete()
         messages.success(request, "Project berhasil dihapus!")
         return redirect("main:show_projects")
