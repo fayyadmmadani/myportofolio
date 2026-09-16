@@ -29,6 +29,7 @@ SECRET_KEY = 'django-insecure-dc1_4(7xm18e7ym^31r6_b$#c8!$j=tu8g)d%v_u8iyze2(_6#
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "fayyad-mohammad-myportofolio.pws.cs.ui.ac.id"]
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
+EDIT_SECRET = os.getenv('EDIT_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PRODUCTION
