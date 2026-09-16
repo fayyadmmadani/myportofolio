@@ -33,6 +33,8 @@ PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = not PRODUCTION
 
+CSRF_TRUSTED_ORIGINS = ["https://fayyad-mohammad-myportofolio.pws.cs.ui.ac.id/"]    
+
 # Application definition
 
 INSTALLED_APPS = [

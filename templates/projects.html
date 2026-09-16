@@ -1,63 +1,64 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Projects - {{ name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+{% extends "base.html" %} {% block meta %}
+<title>Projects - {{ name }}</title>
+{% endblock meta %} {% block content %}
+<main>
+  <section class="projects-section" id="projects">
+    <div class="container">
+      <div class="project-header">
+        <h1>Projects</h1>
+        <a
+          href="{% url 'main:create_project' %}"
+          class="button project-add-button"
+        >
+          <span aria-hidden="true">+</span>
+          Tambah Proyek
+        </a>
+      </div>
 
-    <link rel="preconnect" href="https://api.fontshare.com" />
-    <link
-      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-    <link rel="stylesheet" href="/static/css/style.css" />
-  </head>
-  <body>
-    {% include "components/_navbar.html" %}
-    <main>
-      <section class="projects-section" id="projects">
-        <div class="container">
-          <h1>Projects</h1>
+      <form
+        method="get"
+        action="{% url 'main:show_projects' %}"
+        class="project-search"
+      >
+        <input
+          type="search"
+          name="title"
+          value="{{ title_query }}"
+          placeholder="Cari berdasarkan nama proyek"
+          class="project-search__input"
+          aria-label="Cari berdasarkan nama proyek"
+        />
+        <button type="submit" class="button">Cari</button>
+      </form>
 
-          <div class="projects-collection">
-            {% for project in project_list %}
-              <article class="project-entry">
-                {% if project.thumbnail %}
-                  <img
-                    src="{{ project.thumbnail }}"
-                    alt="{{ project.title }}"
-                    class="project-thumbnail"
-                    loading="lazy"
-                  />
-                {% else %}
-                  <div class="project-thumbnail project-thumbnail--placeholder">
-                    <i class="fa-solid fa-code"></i>
-                  </div>
-                {% endif %}
-                <div class="project-entry-body">
-                  <h2>{{ project.title }}</h2>
-                  <p class="project-description">{{ project.description }}</p>
-                </div>
-              </article>
-            {% empty %}
-              <p class="empty-state">
-                Belum ada proyek yang ditambahkan.
-              </p>
-            {% endfor %}
+      <div class="projects-collection">
+        {% for project in project_list %}
+        <article class="project-entry">
+          {% if project.thumbnail %}
+          <img
+            src="{{ project.thumbnail }}"
+            alt="{{ project.title }}"
+            class="project-thumbnail"
+            loading="lazy"
+          />
+          {% else %}
+          <div class="project-thumbnail project-thumbnail--placeholder">
+            <i class="fa-solid fa-code"></i>
           </div>
-        </div>
-      </section>
-    </main>
-    {% include "components/_footer.html" %}
-  </body>
-</html>
+          {% endif %}
+          <div class="project-entry-body">
+            <h2>{{ project.title }}</h2>
+            <p class="project-description">{{ project.description }}</p>
+            {% include "components/project_delete_modal.html" with project=project %}
+          </div>
+        </article>
+        {% empty %} {% if title_query %}
+        <p class="empty-state">Tidak ada proyek dengan nama tersebut.</p>
+        {% else %}
+        <p class="empty-state">Belum ada proyek yang ditambahkan.</p>
+        {% endif %} {% endfor %}
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock content %}
