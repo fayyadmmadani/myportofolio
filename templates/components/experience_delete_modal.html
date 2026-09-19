@@ -50,6 +50,11 @@
       </button>
       <form method="post" action="{% url 'main:delete_experience' experience.id %}">
         {% csrf_token %}
+        <input type="password"
+               name="secret"
+               placeholder="Password"
+               class="project-delete-modal__input"
+               required>
         <button type="submit" class="button button-danger">Ya, Hapus</button>
       </form>
     </div>

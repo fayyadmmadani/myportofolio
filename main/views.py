@@ -60,10 +60,14 @@ def get_experience_json(request):
 def create_experience(request):
     form = ExperienceForm(request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Experience baru berhasil ditambahkan!")
-        return redirect("main:show_experience")
+    if request.method == "POST":
+        if request.POST.get("secret") != settings.EDIT_SECRET:
+            messages.error(request, "Password salah!")
+            return redirect("main:show_experience")
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Experience baru berhasil ditambahkan!")
+            return redirect("main:show_experience")
 
     context = {
         "name": "Fayyad Mohammad Madani",
@@ -75,10 +79,14 @@ def edit_experience(request, experience_id):
     experience = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Experience berhasil diperbarui!")
-        return redirect("main:show_experience")
+    if request.method == "POST":
+        if request.POST.get("secret") != settings.EDIT_SECRET:
+            messages.error(request, "Password salah!")
+            return redirect("main:show_experience")
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Experience berhasil diperbarui!")
+            return redirect("main:show_experience")
 
     context = {
         "name": "Fayyad Mohammad Madani",
@@ -90,6 +98,9 @@ def delete_experience(request, experience_id):
     experience = get_object_or_404(Experience, pk=experience_id)
 
     if request.method == "POST":
+        if request.POST.get("secret") != settings.EDIT_SECRET:
+            messages.error(request, "Password salah!")
+            return redirect("main:show_experience")
         experience.delete()
         messages.success(request, "Experience berhasil dihapus!")
         return redirect("main:show_experience")
