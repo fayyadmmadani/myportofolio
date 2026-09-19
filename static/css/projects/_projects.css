@@ -220,6 +220,22 @@
   cursor: pointer;
 }
 
+.project-delete-modal__input {
+  width: 100%;
+  padding: 0.7rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.project-delete-modal__input:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}
+
 .project-delete-modal__actions {
   display: flex;
   flex-direction: column-reverse;

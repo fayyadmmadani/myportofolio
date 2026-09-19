@@ -20,6 +20,10 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
+                    <div class="form-group">
+                        <label for="secret">Password</label>
+                        <input type="password" name="secret" id="secret" required>
+                    </div>
                     <button type="submit" class="button">Tambah Project</button>
                     <a href="{% url 'main:show_projects' %}" class="button button-secondary">Batal</a>
                 </form>
