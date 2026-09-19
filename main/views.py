@@ -85,6 +85,25 @@ def create_project(request):
     }
     return render(request, "projects_form.html", context)
 
+def edit_project(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    form = ProjectForm(request.POST or None, instance=project)
+
+    if request.method == "POST":
+        if request.POST.get("secret") != settings.EDIT_SECRET:
+            messages.error(request, "Password salah!")
+            return redirect("main:show_projects")
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Proyek berhasil diperbarui!")
+            return redirect("main:show_projects")
+
+    context = {
+        "name": "Fayyad Mohammad Madani",
+        "form": form,
+    }
+    return render(request, "projects_form.html", context)
+
 def delete_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 

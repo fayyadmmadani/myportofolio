@@ -49,7 +49,10 @@
           <div class="project-entry-body">
             <h2>{{ project.title }}</h2>
             <p class="project-description">{{ project.description }}</p>
-            {% include "components/project_delete_modal.html" with project=project %}
+            <div class="project-entry-actions">
+              <a href="{% url 'main:edit_project' project.id %}" class="button button-secondary">Edit</a>
+              {% include "components/project_delete_modal.html" with project=project %}
+            </div>
           </div>
         </article>
         {% empty %} {% if title_query %}
