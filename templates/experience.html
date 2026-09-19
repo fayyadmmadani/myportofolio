@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block meta %}
     <title>Experience - {{ name }}</title>
 {% endblock meta %}
@@ -34,7 +35,9 @@
                 {% if experience.is_ongoing %}
                   <p class="experience-status">Sedang berlangsung</p>
                 {% else %}
-                  <p class="experience-status">Selesai</p>
+                  <p class="experience-status">
+                    {% language "id" %}{{ experience.started_at|date:"j M Y" }} - {{ experience.ended_at|date:"j M Y" }}{% endlanguage %}
+                  </p>
                 {% endif %}
 
                 <div class="experience-entry-actions">
