@@ -79,6 +79,24 @@
   color: var(--text-secondary);
 }
 
+/* ===== Tombol aksi: Edit + Hapus ===== */
+/* Default = mobile: di tengah */
+.project-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Enhance = desktop: rata kanan */
+@media (min-width: 768px) {
+  .project-entry-actions {
+    justify-content: flex-end;
+  }
+}
+
 /* ===== Header row: judul + tombol tambah ===== */
 /* Default = mobile: ditumpuk vertikal */
 .project-header {
