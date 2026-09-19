@@ -77,3 +77,18 @@
   font-size: 0.85rem;
   font-weight: 600;
 }
+
+.experience-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .experience-entry-actions {
+    justify-content: flex-end;
+  }
+}
