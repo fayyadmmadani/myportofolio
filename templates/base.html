@@ -1,0 +1,103 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="Fayyad Mohammad Madani - Portfolio" />
+    <meta
+      property="og:description"
+      content="Portfolio Fayyad Mohammad Madani, mahasiswa Sistem Informasi Fasilkom UI."
+    />
+    <meta
+      property="og:image"
+      content="https://fayyad-mohammad-myportofolio.pws.cs.ui.ac.id/static/img/og-preview.webp"
+    />
+    <meta
+      property="og:url"
+      content="https://fayyad-mohammad-myportofolio.pws.cs.ui.ac.id/"
+    />
+    <meta property="og:type" content="website" />
+    {% block meta %}{% endblock meta %}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-bar">
+        <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" />
+        <label
+          for="nav-toggle"
+          class="hamburger"
+          aria-label="Toggle navigation"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </label>
+
+        <nav class="nav-links-wrapper" aria-label="Main navigation">
+          <ul class="nav-links">
+            <!-- <li><a href="#profile">Home</a></li> -->
+            <li><a href="{% url 'main:show_main' %}">Profile</a></li>
+            <li>
+              <a href="{% url 'main:show_main' %}#experience">Experience</a>
+            </li>
+            <li><a href="{% url 'main:show_main' %}#projects">Projects</a></li>
+            <li><a href="#tools">Tools</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    {% block content %} {% endblock content %}
+
+    <footer class="site-footer">
+      <div class="container footer-bar">
+        <p class="footer-copy">&copy; 2026 Fayyad Mohammad Madani</p>
+
+        <ul class="footer-socials">
+          <li>
+            <a
+              href="https://github.com/fayyadmmadani"
+              class="footer-social"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i class="fa-brands fa-github footer-social-icon"></i>
+              <span>GitHub</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/in/fayyadmmadani/"
+              class="footer-social"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i class="fa-brands fa-linkedin footer-social-icon"></i>
+              <span>LinkedIn</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>

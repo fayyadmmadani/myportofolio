@@ -78,3 +78,200 @@
 .project-description {
   color: var(--text-secondary);
 }
+
+/* ===== Tombol aksi: Edit + Hapus ===== */
+/* Default = mobile: di tengah */
+.project-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Enhance = desktop: rata kanan */
+@media (min-width: 768px) {
+  .project-entry-actions {
+    justify-content: flex-end;
+  }
+}
+
+/* ===== Header row: judul + tombol tambah ===== */
+/* Default = mobile: ditumpuk vertikal */
+.project-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-header h1 {
+  margin: 0;
+}
+
+.project-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+/* Enhance = desktop: sejajar kiri-kanan */
+@media (min-width: 768px) {
+  .project-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .project-add-button {
+    width: auto;
+  }
+}
+
+/* ===== Form pencarian ===== */
+/* Default = mobile: ditumpuk, tombol full width */
+.project-search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-search__input {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.project-search__input:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}
+
+.project-search .button {
+  width: 100%;
+}
+
+/* Enhance = desktop: sejajar horizontal */
+@media (min-width: 768px) {
+  .project-search {
+    flex-direction: row;
+  }
+
+  .project-search .button {
+    width: auto;
+  }
+}
+
+/* ===== Tombol danger (dipakai tombol Hapus) ===== */
+.button-danger {
+  background: #b42318;
+}
+
+/* ===== Modal konfirmasi hapus (HTML5 popover) ===== */
+.project-delete-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;              /* matikan margin:auto bawaan browser, kita center manual */
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border: 0;
+  background: transparent;
+}
+
+.project-delete-modal:popover-open {
+  display: flex;
+}
+
+.project-delete-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.project-delete-modal__content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  padding: 1.5rem;
+  background: #161920;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.45);
+}
+
+.project-delete-modal__content h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+}
+
+.project-delete-modal__content p {
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.project-delete-modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.project-delete-modal__input {
+  width: 100%;
+  padding: 0.7rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.project-delete-modal__input:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}
+
+.project-delete-modal__actions {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.75rem;
+}
+
+.project-delete-modal__actions .button {
+  width: 100%;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .project-delete-modal__actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .project-delete-modal__actions .button {
+    width: auto;
+  }
+}

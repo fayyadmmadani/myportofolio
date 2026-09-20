@@ -6,6 +6,8 @@
 @import url(landing/_tools.css);
 @import url(experience/_experience.css);
 @import url(projects/_projects.css);
+@import url(projects/projects_form.css);
+@import url(experience/experience_form.css);
 @import url(error/_404.css);
 
 * {
@@ -20,6 +22,8 @@
   --text-secondary: #71717a;
   --accent: #2f6fed;
   --border: #26282e;
+  --radius: 10px;
+  --ink: #1c1e24;
 
   --font-heading: "Satoshi", -apple-system, sans-serif;
   --font-body: "Inter", -apple-system, sans-serif;
@@ -59,7 +63,9 @@ main {
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .btn-small:hover,
