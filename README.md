@@ -55,22 +55,35 @@ Catatan untuk pengguna macOS/Linux, perintah aktivasinya berbeda: `source env/bi
 
 Setelah itu, buka `http://127.0.0.1:8000/` atau `http://localhost:8000` di browser.
 
-### Tugas 2
+### Tugas 3
 
-1. Pertama, browser kirim request ke urls.py milik proyek, kemudian ke urls.py aplikasi terkait dan panggil view yang tepat. Selanjutnya, view akan memanggil model untuk mengambil data yang dibutuhkan, kemudian menyertakan data tersebut ke template yang sesuai. ketika template sudah diisi dengan data dari model, view akan mereturn hasil tersebut sebagai response ke browser milik user.
-2. Data sebaiknya disimpan pada model dan tidak langsung di template karena beberapa alasan. Salah satu yang utama adalah separation of concern. Dengan membuatnya di model dan tidak langsung di template, akan membuat template bisa fokus kepada bagaimana data data tersebut akan ditampilkan. Tak hanya itu, dengan menaruh data di model, aplikasi bisa lebih dinamis karena tidak harus menulis data secara langsung (hardcode). Dari sisi maintanability, menghapus data dari database lebih aman daripada langsung dari file kode yang rawan terlewat.
-3. makemigrations dan migrate pada Django merupakan sebuah command yang bisa dijalankan pada proyek Django. Kedua command ini berperan dalam sebuah pipeline migrasi database. Perbedaannya terletak pada apa yang dilakukan secara spesifik:
-   - makemigrations berfokus dalam mendeteksi perubahan pada model yang sudah ada. Jika terdapat perubahan, maka akan dibuat sebuah file migrasi.
-   - migrate adalah yang menjadi eksekutor dalam menerjemahkan operasi-operasi yang berhubungan dengan database langsung ke dalam query database bersangkutan (misal sql).
-Contohnya saat menambahkan field baru order pada model Project di project ini, makemigrations mendeteksi perubahan itu dan membuat file migrasi baru (0003_project_order.py), lalu migrate menjalankan file tersebut sehingga kolom order benar-benar ditambahkan ke tabel Project di database.
+1. ModelForm dipilih ketimbang form HTML manual karena beberapa alasan:
+   - Integrasi: ModelForm Django otomatis terintegrasi dengan database lewat mapper bawaan Django.
+   - Konsistensi: Mengikuti definisi model (models.py), seperti max length, format URL, dsb.
+   - Less Boilerplate: dengan ModelForm, akan mengautomisasi widget HTML yang sesuai tipe field. (misal field choices langsung membuat ```<select>```)
+
+   Adapun penggunaan ``` {% csrf_token %} ``` (Cross-Site Request Forgery) merupakan token yang mencegah situs lain memicu request ke situs kita, seperti submit form tambah, ubah, atau hapus data. Request tersebut dapat membuat HTTP request yang sebenarnya tidak ingin dilakukan user situs kita.
+2. Ada beberapa alasan kenapa JSON lebih dipilih daripada XML. Antara lain:
+   - Ringkas (Less verbose): syntax json fokus kepada format key:value yang sederhana daripada xml yang butuh opening dan closing tag tiap elemen.
+   - Native ke JavaScript: mayoritas aplikasi web modern berbasis java script di sisi client, karena JSON sendiri adalah subset dari syntax object pada JavaScript, browser client bisa langsung parsing tanpa parser tambahan (misal XML butuh DOMParser, dsb yang lebih berat)
+3. Contoh proses serialization di aplikasi ini ada pada method get_experience_json. alurnya:
+   1. Membuat HTTP request GET ke server
+   2. Data (dalam python) disimpan pada variabel experiences
+   3. Data yang ada di serialize ke JSON
+   4. return HTTP response data yang sudah di serialize ke JSON tersebut
+   serialization tersebut diperlukan agar browser bisa membaca data tersebut. (format JSON adalah format yang universal sehingga bisa dibaca di client manapun (browser, mobile, dsb))
 
 ### AI Disclosure
 
 Tools: Claude\
 Strategi Prompting:
-- Diskusi terkait style yang menyesuaikan dengan tema aplikasi secara keseluruhan.
 - Bertanya seputar konsep dan penerapan yang sesuai pada proyek Django.
+Bagian Spesifik yang dibantu:
+- Cara implementasi template inheritance
+- Cara implementasi create, update, dan delete pada view
+- Cara implementasi dan integrasi penggunaan field password untuk create, update, dan delete.
+- Cara refactor ke alur serialize dan deserialize dalam mengambil dan mereturn data.
 
-Detail Chat: https://claude.ai/share/cfe72149-66f5-4ece-a781-ab52425e564d
+Detail Chat: https://claude.ai/share/f4910087-487d-430f-a065-118b0f5cae01
 
 
