@@ -41,13 +41,28 @@ Catatan untuk pengguna macOS/Linux, perintah aktivasinya berbeda: `source env/bi
    pip install -r requirements.txt
 ```
 
-5. Jalankan migrasi database:
+5. Buat file `.env` di root project dengan isi berikut:
+
+```env
+   PRODUCTION=False
+   EDIT_SECRET=<password-bebas>
+```
+
+`EDIT_SECRET` adalah password yang diminta setiap kali menambah, mengubah, atau menghapus data.
+
+6. Jalankan migrasi database (sekaligus membuat grup `Editor` secara otomatis):
 
 ```bash
    python manage.py migrate
 ```
 
-6. Jalankan development server:
+7. Buat akun pemilik portofolio (superuser):
+
+```bash
+   python manage.py createsuperuser
+```
+
+8. Jalankan development server:
 
 ```bash
    python manage.py runserver
@@ -55,35 +70,32 @@ Catatan untuk pengguna macOS/Linux, perintah aktivasinya berbeda: `source env/bi
 
 Setelah itu, buka `http://127.0.0.1:8000/` atau `http://localhost:8000` di browser.
 
-### Tugas 3
+### Menetapkan Peran Editor
 
-1. ModelForm dipilih ketimbang form HTML manual karena beberapa alasan:
-   - Integrasi: ModelForm Django otomatis terintegrasi dengan database lewat mapper bawaan Django.
-   - Konsistensi: Mengikuti definisi model (models.py), seperti max length, format URL, dsb.
-   - Less Boilerplate: dengan ModelForm, akan mengautomisasi widget HTML yang sesuai tipe field. (misal field choices langsung membuat ```<select>```)
+1. Daftarkan akun baru lewat halaman Register.
+2. Login ke `/admin` menggunakan akun superuser.
+3. Buka **Users**, pilih akun tersebut, lalu tambahkan ke grup **Editor** pada bagian *Groups* dan simpan.
 
-   Adapun penggunaan ``` {% csrf_token %} ``` (Cross-Site Request Forgery) merupakan token yang mencegah situs lain memicu request ke situs kita, seperti submit form tambah, ubah, atau hapus data. Request tersebut dapat membuat HTTP request yang sebenarnya tidak ingin dilakukan user situs kita.
-2. Ada beberapa alasan kenapa JSON lebih dipilih daripada XML. Antara lain:
-   - Ringkas (Less verbose): syntax json fokus kepada format key:value yang sederhana daripada xml yang butuh opening dan closing tag tiap elemen.
-   - Native ke JavaScript: mayoritas aplikasi web modern berbasis java script di sisi client, karena JSON sendiri adalah subset dari syntax object pada JavaScript, browser client bisa langsung parsing tanpa parser tambahan (misal XML butuh DOMParser, dsb yang lebih berat)
-3. Contoh proses serialization di aplikasi ini ada pada method get_experience_json. alurnya:
-   1. Membuat HTTP request GET ke server
-   2. Data (dalam python) disimpan pada variabel experiences
-   3. Data yang ada di serialize ke JSON
-   4. return HTTP response data yang sudah di serialize ke JSON tersebut
-   serialization tersebut diperlukan agar browser bisa membaca data tersebut. (format JSON adalah format yang universal sehingga bisa dibaca di client manapun (browser, mobile, dsb))
+Akun Editor dapat mengubah data Projects dan Experience, tetapi tidak dapat menambah atau menghapusnya.
+
+### Menjalankan Test
+
+```bash
+   python manage.py test
+```
+
+### Tugas 4
 
 ### AI Disclosure
 
 Tools: Claude\
 Strategi Prompting:
-- Bertanya seputar konsep dan penerapan yang sesuai pada proyek Django.
+- Memberikan dokumen soal Tugas 4 dan meminta analisis selisih antara requirement dengan kondisi repositori saat ini.
+- Mendiskusikan pemetaan pekerjaan per branch (feat/auth, feat/experience, feat/projects) sebelum eksekusi, lalu meminta implementasi per branch dan melakukan review, commit, serta merge sendiri.
 Bagian Spesifik yang dibantu:
-- Cara implementasi template inheritance
-- Cara implementasi create, update, dan delete pada view
-- Cara implementasi dan integrasi penggunaan field password untuk create, update, dan delete.
-- Cara refactor ke alur serialize dan deserialize dalam mengambil dan mereturn data.
-
-Detail Chat: https://claude.ai/share/f4910087-487d-430f-a065-118b0f5cae01
-
-
+- Perbaikan implementasi Tutorial 4: key context last_login, route toggle_star, komponen tombol star, dan tampilan sesi terakhir login.
+- Cara implementasi peran Editor melalui Django Group menggunakan data migration.
+- Cara memisahkan logika otorisasi ke helper (is_editor, can_edit, can_create_or_delete) agar dipakai bersama oleh Projects dan Experience.
+- Cara menerapkan pembatasan hak akses di sisi server (redirect login dan HTTP 403) serta menyembunyikan tombol aksi sesuai peran di template.
+- Cara membuat halaman 403 custom.
+- Cara menulis unit test untuk hak akses keempat peran, fitur star, dan keamanan endpoint JSON, serta memperbaiki test lama yang gagal.
