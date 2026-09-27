@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block meta %}
+  <title>403 - Forbidden</title>
+{% endblock meta %}
+
+{% block content %}
+<main class="not-found">
+      <div class="container not-found-content">
+        <p class="not-found-code">403</p>
+        <h1>Forbidden</h1>
+        <p class="not-found-message">
+          You don't have permission to perform this action.
+        </p>
+        <a href="{% url 'main:show_main' %}" class="btn-small">Back to the Home Page</a>
+      </div>
+    </main>
+{% endblock content %}
