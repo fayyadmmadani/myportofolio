@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from main.models import Experience, Project
 from main.forms import ProjectForm, ExperienceForm
+from main.permissions import can_create_or_delete, can_edit, is_editor
 
 def register(request):
     form = UserCreationForm(request.POST or None)
@@ -83,6 +84,7 @@ def show_experience(request):
     context = {
         "name": "Fayyad Mohammad Madani",
         "experience_list": experiences,
+        "is_editor": is_editor(request.user),
     }
     return render(request, "experience.html", context)
 
@@ -100,8 +102,8 @@ def get_experience_json(request):
 
 @login_required(login_url="/login/")
 def create_experience(request):
-    # Authorization
-    if not request.user.is_superuser:
+    # Authorization: hanya pemilik portofolio yang boleh menambah data
+    if not can_create_or_delete(request.user):
         raise PermissionDenied
     
     form = ExperienceForm(request.POST or None)
@@ -123,8 +125,8 @@ def create_experience(request):
 
 @login_required(login_url="/login/")
 def edit_experience(request, experience_id):
-    # Authorization
-    if not request.user.is_superuser:
+    # Authorization: pemilik portofolio dan Editor boleh mengubah data
+    if not can_edit(request.user):
         raise PermissionDenied
     
     experience = get_object_or_404(Experience, pk=experience_id)
@@ -147,8 +149,8 @@ def edit_experience(request, experience_id):
 
 @login_required(login_url="/login/")
 def delete_experience(request, experience_id):
-    # Authorization
-    if not request.user.is_superuser:
+    # Authorization: hanya pemilik portofolio yang boleh menghapus data
+    if not can_create_or_delete(request.user):
         raise PermissionDenied
     
     experience = get_object_or_404(Experience, pk=experience_id)

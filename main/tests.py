@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AnonymousUser, Group, User
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
@@ -66,13 +66,126 @@ class ExperienceTest(TestCase):
         self.assertContains(response, "Belum ada pengalaman yang ditambahkan.")
 
     def test_completed_experience(self):
-        self.experience.ended_at = timezone.now()
+        self.experience.started_at = timezone.now().replace(
+            year=2025, month=1, day=5, hour=12, minute=0, second=0, microsecond=0
+        )
+        self.experience.ended_at = self.experience.started_at.replace(month=3, day=20)
         self.experience.save()
         response = self.client.get(reverse("main:show_experience"))
 
         self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "Selesai")
+        self.assertContains(response, "5 Jan 2025 - 20 Mar 2025")
         self.assertNotContains(response, "Sedang berlangsung")
+
+
+@override_settings(EDIT_SECRET="rahasia-uji")
+class ExperienceAccessTest(TestCase):
+    """Menguji hak akses keempat peran pada fitur Experience."""
+
+    SECRET = "rahasia-uji"
+
+    def setUp(self):
+        self.experience = Experience.objects.create(
+            title="Asisten Dosen PBP",
+            description="Membantu mahasiswa memahami pengembangan web.",
+            category="part-time",
+        )
+        self.regular = User.objects.create_user(
+            username="pengguna", password="rahasia123"
+        )
+        self.editor = User.objects.create_user(
+            username="editor", password="rahasia123"
+        )
+        self.editor.groups.add(Group.objects.get(name=EDITOR_GROUP_NAME))
+        self.owner = User.objects.create_superuser(
+            username="pemilik", password="rahasia123"
+        )
+
+        self.list_url = reverse("main:show_experience")
+        self.create_url = reverse("main:create_experience")
+        self.edit_url = reverse("main:edit_experience", args=[self.experience.id])
+        self.delete_url = reverse("main:delete_experience", args=[self.experience.id])
+
+    def assertExperienceStillExists(self):
+        self.assertTrue(Experience.objects.filter(pk=self.experience.pk).exists())
+
+    def test_anonymous_can_read_but_must_login_to_change(self):
+        self.assertEqual(self.client.get(self.list_url).status_code, 200)
+
+        for url in (self.create_url, self.edit_url):
+            response = self.client.get(url)
+            self.assertRedirects(
+                response, f"/login/?next={url}", fetch_redirect_response=False
+            )
+
+        response = self.client.post(self.delete_url, {"secret": self.SECRET})
+        self.assertRedirects(
+            response, f"/login/?next={self.delete_url}", fetch_redirect_response=False
+        )
+        self.assertExperienceStillExists()
+
+    def test_regular_user_is_forbidden_from_changing_data(self):
+        self.client.force_login(self.regular)
+
+        self.assertEqual(self.client.get(self.create_url).status_code, 403)
+        self.assertEqual(self.client.get(self.edit_url).status_code, 403)
+        response = self.client.post(self.delete_url, {"secret": self.SECRET})
+        self.assertEqual(response.status_code, 403)
+        self.assertExperienceStillExists()
+
+    def test_editor_can_edit_experience(self):
+        self.client.force_login(self.editor)
+
+        self.assertEqual(self.client.get(self.edit_url).status_code, 200)
+        response = self.client.post(
+            self.edit_url,
+            {
+                "title": "Asisten Dosen PBP (diperbarui)",
+                "description": self.experience.description,
+                "category": "part-time",
+                "secret": self.SECRET,
+            },
+        )
+        self.assertRedirects(response, self.list_url)
+        self.experience.refresh_from_db()
+        self.assertEqual(self.experience.title, "Asisten Dosen PBP (diperbarui)")
+
+    def test_editor_cannot_create_or_delete(self):
+        self.client.force_login(self.editor)
+
+        self.assertEqual(self.client.get(self.create_url).status_code, 403)
+        response = self.client.post(self.delete_url, {"secret": self.SECRET})
+        self.assertEqual(response.status_code, 403)
+        self.assertExperienceStillExists()
+
+    def test_owner_can_create_and_delete(self):
+        self.client.force_login(self.owner)
+
+        self.assertEqual(self.client.get(self.create_url).status_code, 200)
+        response = self.client.post(self.delete_url, {"secret": self.SECRET})
+        self.assertRedirects(response, self.list_url)
+        self.assertFalse(Experience.objects.filter(pk=self.experience.pk).exists())
+
+    def test_action_buttons_follow_user_role(self):
+        edit_link = f'href="{self.edit_url}"'
+
+        self.client.force_login(self.regular)
+        response = self.client.get(self.list_url)
+        self.assertNotContains(response, edit_link)
+        self.assertNotContains(response, "Tambah Experience")
+        self.assertNotContains(response, "Hapus Experience")
+
+        self.client.force_login(self.editor)
+        response = self.client.get(self.list_url)
+        self.assertContains(response, edit_link)
+        self.assertNotContains(response, "Tambah Experience")
+        self.assertNotContains(response, "Hapus Experience")
+
+        self.client.force_login(self.owner)
+        response = self.client.get(self.list_url)
+        self.assertContains(response, edit_link)
+        self.assertContains(response, "Tambah Experience")
+        self.assertContains(response, "Hapus Experience")
 
 
 class ProjectTest(TestCase):
