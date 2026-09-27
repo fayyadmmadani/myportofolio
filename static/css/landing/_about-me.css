@@ -36,6 +36,12 @@
   margin-bottom: 1rem;
 }
 
+.about-last-login {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
 .about-bio {
   color: var(--text-secondary);
   max-width: 480px;
