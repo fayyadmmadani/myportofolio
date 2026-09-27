@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from main.models import Experience, Project
 from main.forms import ProjectForm, ExperienceForm
+from main.permissions import can_create_or_delete, can_edit, is_editor
 
 def register(request):
     form = UserCreationForm(request.POST or None)
@@ -177,6 +178,7 @@ def show_projects(request):
         "name": "Fayyad Mohammad Madani",
         "project_list": projects,
         "title_query": title_query,
+        "is_editor": is_editor(request.user),
     }
     return render(request, "projects.html", context)
 
@@ -192,8 +194,8 @@ def get_projects_json(request):
 
 @login_required(login_url="/login/")
 def create_project(request):
-    # Authorization
-    if not request.user.is_superuser:
+    # Authorization: hanya pemilik portofolio yang boleh menambah data
+    if not can_create_or_delete(request.user):
         raise PermissionDenied
 
     form = ProjectForm(request.POST or None)
@@ -215,8 +217,8 @@ def create_project(request):
 
 @login_required(login_url="/login/")
 def edit_project(request, project_id):
-    # Authorization
-    if not request.user.is_superuser:
+    # Authorization: pemilik portofolio dan Editor boleh mengubah data
+    if not can_edit(request.user):
         raise PermissionDenied
     
     project = get_object_or_404(Project, pk=project_id)
@@ -253,8 +255,8 @@ def toggle_star(request, project_id):
 
 @login_required(login_url="/login/")
 def delete_project(request, project_id):
-    # Authorization
-    if not request.user.is_superuser:
+    # Authorization: hanya pemilik portofolio yang boleh menghapus data
+    if not can_create_or_delete(request.user):
         raise PermissionDenied
     
     project = get_object_or_404(Project, pk=project_id)
