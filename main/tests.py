@@ -203,16 +203,31 @@ class ProjectTest(TestCase):
         self.assertTemplateUsed(response, "projects.html")
 
     def test_project_page_shows_data(self):
+        # Kartu dirender oleh JavaScript (AJAX), jadi halaman hanya berisi
+        # kerangka + endpoint, sedangkan datanya diperiksa lewat API JSON.
         response = self.client.get(reverse("main:show_projects"))
+        self.assertContains(response, 'id="grid"')
+        self.assertContains(response, reverse("main:get_projects_json"))
 
-        self.assertContains(response, self.project.title)
-        self.assertContains(response, self.project.description)
+        data = self.client.get(reverse("main:get_projects_json")).json()
+        self.assertEqual(data[0]["fields"]["title"], self.project.title)
+        self.assertEqual(data[0]["fields"]["description"], self.project.description)
 
     def test_empty_projects_page(self):
         Project.objects.all().delete()
         response = self.client.get(reverse("main:show_projects"))
 
-        self.assertContains(response, "Belum ada proyek yang ditambahkan.")
+        self.assertContains(response, "Belum ada proyek yang ditambahkan atau ditemukan.")
+        self.assertEqual(self.client.get(reverse("main:get_projects_json")).json(), [])
+
+    def test_projects_json_can_filter_by_title(self):
+        Project.objects.create(title="Aplikasi Lain", description="-")
+        data = self.client.get(
+            reverse("main:get_projects_json"), {"title": "portfolio"}
+        ).json()
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["fields"]["title"], self.project.title)
 
 
 @override_settings(EDIT_SECRET="rahasia-uji")
@@ -311,26 +326,30 @@ class ProjectAccessTest(TestCase):
         self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
 
     def test_action_buttons_follow_user_role(self):
-        edit_link = f'href="{self.edit_url}"'
+        # Tombol Edit/Hapus dirakit JavaScript berdasarkan flag IS_SUPERUSER
+        # dan CAN_EDIT yang dirender server, sedangkan tombol & modal
+        # Tambah Proyek dirender langsung oleh template.
+        owner_flag = 'const IS_SUPERUSER = "true"'
+        editor_flag = 'IS_SUPERUSER || "true" === "true"'
 
         self.client.force_login(self.regular)
         response = self.client.get(self.list_url)
-        self.assertContains(response, f'action="{self.star_url}"')
-        self.assertNotContains(response, edit_link)
+        self.assertNotContains(response, owner_flag)
+        self.assertNotContains(response, editor_flag)
         self.assertNotContains(response, "Tambah Proyek")
-        self.assertNotContains(response, "Hapus Proyek")
+        self.assertNotContains(response, 'id="add-project-modal"')
 
         self.client.force_login(self.editor)
         response = self.client.get(self.list_url)
-        self.assertContains(response, edit_link)
+        self.assertNotContains(response, owner_flag)
+        self.assertContains(response, editor_flag)
         self.assertNotContains(response, "Tambah Proyek")
-        self.assertNotContains(response, "Hapus Proyek")
 
         self.client.force_login(self.owner)
         response = self.client.get(self.list_url)
-        self.assertContains(response, edit_link)
+        self.assertContains(response, owner_flag)
         self.assertContains(response, "Tambah Proyek")
-        self.assertContains(response, "Hapus Proyek")
+        self.assertContains(response, 'id="add-project-modal"')
 
     # ---------- fitur star ----------
 
@@ -362,10 +381,16 @@ class ProjectAccessTest(TestCase):
         self.client.force_login(self.regular)
         self.client.post(self.star_url)
 
-        response = self.client.get(self.list_url)
-        self.assertContains(response, "is-starred")
-        self.assertContains(response, "Unstar")
-        self.assertContains(response, '<span class="star-count">1</span>', html=True)
+        fields = self.client.get(self.api_url).json()[0]["fields"]
+        self.assertTrue(fields["is_starred"])
+        self.assertEqual(fields["star_count"], 1)
+        self.assertEqual(fields["starred_by_names"], "pengguna")
+
+        # Pengguna lain melihat jumlah yang sama, tetapi belum memberi star
+        self.client.force_login(self.editor)
+        fields = self.client.get(self.api_url).json()[0]["fields"]
+        self.assertFalse(fields["is_starred"])
+        self.assertEqual(fields["star_count"], 1)
 
     # ---------- API ----------
 
@@ -377,9 +402,85 @@ class ProjectAccessTest(TestCase):
 
         fields = response.json()[0]["fields"]
         self.assertEqual(fields["title"], self.project.title)
-        self.assertEqual(fields["starred_by"], [["pengguna"]])
+        self.assertEqual(fields["starred_by_names"], "pengguna")
+        self.assertNotIn("starred_by", fields)
         self.assertNotIn("password", response.content.decode())
         self.assertNotIn("pbkdf2", response.content.decode())
+
+
+@override_settings(EDIT_SECRET="rahasia-uji")
+class ProjectAjaxCreateTest(TestCase):
+    """Menguji endpoint AJAX tambah proyek beserta sanitasi input (XSS)."""
+
+    def setUp(self):
+        self.url = reverse("main:create_project_ajax")
+        self.regular = User.objects.create_user(
+            username="pengguna", password="rahasia123"
+        )
+        self.editor = User.objects.create_user(
+            username="editor", password="rahasia123"
+        )
+        self.editor.groups.add(Group.objects.get(name=EDITOR_GROUP_NAME))
+        self.owner = User.objects.create_superuser(
+            username="pemilik", password="rahasia123"
+        )
+        self.valid_data = {
+            "title": "Proyek AJAX",
+            "description": "Ditambahkan lewat modal.",
+            "thumbnail": "",
+            "order": 0,
+        }
+
+    def test_only_post_is_allowed(self):
+        self.client.force_login(self.owner)
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+
+    def test_non_owner_gets_json_403(self):
+        for user in (None, self.regular, self.editor):
+            if user:
+                self.client.force_login(user)
+            response = self.client.post(self.url, self.valid_data)
+            self.assertEqual(response.status_code, 403)
+            self.assertIn("message", response.json())
+        self.assertFalse(Project.objects.exists())
+
+    def test_owner_can_create_project(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(self.url, self.valid_data)
+
+        self.assertEqual(response.status_code, 201)
+        project = Project.objects.get(pk=response.json()["pk"])
+        self.assertEqual(project.title, "Proyek AJAX")
+
+    def test_invalid_data_returns_field_errors(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(self.url, {**self.valid_data, "title": ""})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("title", response.json()["errors"])
+        self.assertFalse(Project.objects.exists())
+
+    def test_html_only_title_is_rejected(self):
+        self.client.force_login(self.owner)
+        payload = {**self.valid_data, "title": '<img src="x" onerror="alert(1)">'}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("title", response.json()["errors"])
+
+    def test_html_tags_are_stripped(self):
+        self.client.force_login(self.owner)
+        payload = {
+            **self.valid_data,
+            "title": "Halo <b>dunia</b>",
+            "description": "<script>alert(1)</script>Aman",
+        }
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, 201)
+        project = Project.objects.get(pk=response.json()["pk"])
+        self.assertEqual(project.title, "Halo dunia")
+        self.assertNotIn("<script>", project.description)
 
 
 class PermissionHelperTest(TestCase):
