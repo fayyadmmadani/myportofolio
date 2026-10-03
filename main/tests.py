@@ -49,21 +49,55 @@ class ExperienceTest(TestCase):
         self.assertTrue(self.experience.is_ongoing)
 
     def test_experience_page(self):
+        # Kartu dirender oleh JavaScript (AJAX): halaman hanya berisi kerangka
+        # dan endpoint, sedangkan datanya diperiksa lewat API JSON.
         response = self.client.get(reverse("main:show_experience"))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "experience.html")
-        self.assertContains(response, self.experience.title)
-        self.assertContains(response, self.experience.description)
-        self.assertContains(response, "Part-Time")
-        self.assertContains(response, "Sedang berlangsung")
+        self.assertContains(response, 'id="grid"')
+        self.assertContains(response, reverse("main:get_experience_json"))
         self.assertContains(response, f'href="{reverse("main:show_main")}"')
+
+        fields = self.client.get(reverse("main:get_experience_json")).json()[0]["fields"]
+        self.assertEqual(fields["title"], self.experience.title)
+        self.assertEqual(fields["description"], self.experience.description)
+        self.assertEqual(fields["category_display"], "Part-Time")
+        self.assertTrue(fields["is_ongoing"])
 
     def test_empty_experience_page(self):
         Experience.objects.all().delete()
         response = self.client.get(reverse("main:show_experience"))
 
-        self.assertContains(response, "Belum ada pengalaman yang ditambahkan.")
+        self.assertContains(response, "Belum ada pengalaman yang ditambahkan atau ditemukan.")
+        self.assertEqual(self.client.get(reverse("main:get_experience_json")).json(), [])
+
+    def test_experience_json_filters(self):
+        Experience.objects.create(
+            title="Magang Backend", description="-", category="internship"
+        )
+        url = reverse("main:get_experience_json")
+
+        by_title = self.client.get(url, {"title": "magang"}).json()
+        self.assertEqual([e["fields"]["title"] for e in by_title], ["Magang Backend"])
+
+        by_category = self.client.get(url, {"category": "part-time"}).json()
+        self.assertEqual([e["fields"]["title"] for e in by_category], ["Asisten Dosen PBP"])
+
+        combined = self.client.get(url, {"title": "magang", "category": "part-time"}).json()
+        self.assertEqual(combined, [])
+
+        unknown = self.client.get(url, {"category": "tidak-ada"})
+        self.assertEqual(unknown.status_code, 200)
+        self.assertEqual(unknown.json(), [])
+
+    def test_category_filter_options_are_rendered(self):
+        response = self.client.get(reverse("main:show_experience"))
+
+        self.assertContains(response, 'id="category-filter"')
+        self.assertContains(response, '<option value="">Semua kategori</option>', html=True)
+        for value, label in Experience.EXPERIENCE_CHOICES:
+            self.assertContains(response, f'<option value="{value}">{label}</option>', html=True)
 
     def test_completed_experience(self):
         self.experience.started_at = timezone.now().replace(
@@ -71,11 +105,11 @@ class ExperienceTest(TestCase):
         )
         self.experience.ended_at = self.experience.started_at.replace(month=3, day=20)
         self.experience.save()
-        response = self.client.get(reverse("main:show_experience"))
+        fields = self.client.get(reverse("main:get_experience_json")).json()[0]["fields"]
 
         self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "5 Jan 2025 - 20 Mar 2025")
-        self.assertNotContains(response, "Sedang berlangsung")
+        self.assertFalse(fields["is_ongoing"])
+        self.assertEqual(fields["period"], "5 Jan 2025 - 20 Mar 2025")
 
 
 @override_settings(EDIT_SECRET="rahasia-uji")
@@ -167,25 +201,115 @@ class ExperienceAccessTest(TestCase):
         self.assertFalse(Experience.objects.filter(pk=self.experience.pk).exists())
 
     def test_action_buttons_follow_user_role(self):
-        edit_link = f'href="{self.edit_url}"'
+        # Tombol Edit/Hapus dirakit JavaScript berdasarkan flag IS_SUPERUSER
+        # dan CAN_EDIT yang dirender server; tombol & modal Tambah Experience
+        # dirender langsung oleh template hanya untuk pemilik.
+        owner_flag = 'const IS_SUPERUSER = "true"'
+        editor_flag = 'IS_SUPERUSER || "true" === "true"'
+        modal = 'id="add-experience-modal"'
 
         self.client.force_login(self.regular)
         response = self.client.get(self.list_url)
-        self.assertNotContains(response, edit_link)
-        self.assertNotContains(response, "Tambah Experience")
-        self.assertNotContains(response, "Hapus Experience")
+        self.assertNotContains(response, owner_flag)
+        self.assertNotContains(response, editor_flag)
+        self.assertNotContains(response, modal)
 
         self.client.force_login(self.editor)
         response = self.client.get(self.list_url)
-        self.assertContains(response, edit_link)
-        self.assertNotContains(response, "Tambah Experience")
-        self.assertNotContains(response, "Hapus Experience")
+        self.assertNotContains(response, owner_flag)
+        self.assertContains(response, editor_flag)
+        self.assertNotContains(response, modal)
 
         self.client.force_login(self.owner)
         response = self.client.get(self.list_url)
-        self.assertContains(response, edit_link)
-        self.assertContains(response, "Tambah Experience")
-        self.assertContains(response, "Hapus Experience")
+        self.assertContains(response, owner_flag)
+        self.assertContains(response, modal)
+
+
+@override_settings(EDIT_SECRET="rahasia-uji")
+class ExperienceAjaxCreateTest(TestCase):
+    """Menguji endpoint AJAX tambah experience beserta sanitasi input (XSS)."""
+
+    SECRET = "rahasia-uji"
+
+    def setUp(self):
+        self.url = reverse("main:create_experience_ajax")
+        self.regular = User.objects.create_user(
+            username="pengguna", password="rahasia123"
+        )
+        self.editor = User.objects.create_user(
+            username="editor", password="rahasia123"
+        )
+        self.editor.groups.add(Group.objects.get(name=EDITOR_GROUP_NAME))
+        self.owner = User.objects.create_superuser(
+            username="pemilik", password="rahasia123"
+        )
+        self.valid_data = {
+            "title": "Magang Backend",
+            "description": "Membangun API dengan Django.",
+            "category": "internship",
+            "thumbnail": "",
+            "ended_at": "",
+            "secret": self.SECRET,
+        }
+
+    def test_only_post_is_allowed(self):
+        self.client.force_login(self.owner)
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+
+    def test_non_owner_gets_json_403(self):
+        for user in (None, self.regular, self.editor):
+            if user:
+                self.client.force_login(user)
+            response = self.client.post(self.url, self.valid_data)
+            self.assertEqual(response.status_code, 403)
+            self.assertIn("message", response.json())
+        self.assertFalse(Experience.objects.exists())
+
+    def test_wrong_secret_is_rejected(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(self.url, {**self.valid_data, "secret": "salah"})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Experience.objects.exists())
+
+    def test_owner_can_create_experience(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(self.url, self.valid_data)
+
+        self.assertEqual(response.status_code, 201)
+        experience = Experience.objects.get(pk=response.json()["pk"])
+        self.assertEqual(experience.title, "Magang Backend")
+
+    def test_invalid_data_returns_field_errors(self):
+        self.client.force_login(self.owner)
+        response = self.client.post(self.url, {**self.valid_data, "title": ""})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("title", response.json()["errors"])
+        self.assertFalse(Experience.objects.exists())
+
+    def test_html_only_title_is_rejected(self):
+        self.client.force_login(self.owner)
+        payload = {**self.valid_data, "title": '<img src="x" onerror="alert(1)">'}
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("title", response.json()["errors"])
+
+    def test_html_tags_are_stripped(self):
+        self.client.force_login(self.owner)
+        payload = {
+            **self.valid_data,
+            "title": "Halo <b>dunia</b>",
+            "description": "<script>alert(1)</script>Aman",
+        }
+        response = self.client.post(self.url, payload)
+
+        self.assertEqual(response.status_code, 201)
+        experience = Experience.objects.get(pk=response.json()["pk"])
+        self.assertEqual(experience.title, "Halo dunia")
+        self.assertNotIn("<script>", experience.description)
 
 
 class ProjectTest(TestCase):
