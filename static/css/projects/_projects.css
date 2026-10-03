@@ -297,3 +297,121 @@
   background: rgba(255, 255, 255, 0.15);
   font-size: 0.8rem;
 }
+
+/* ===== Modal form tambah proyek (HTML5 popover) ===== */
+.project-form-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 1rem;
+  border: 0;
+  background: transparent;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-form-modal:popover-open {
+  display: flex;
+}
+
+.project-form-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.58);
+  cursor: default;
+}
+
+.project-form-modal__content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 640px);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #161920;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.45);
+}
+
+.project-form-modal__content h2 {
+  margin: 0 2.5rem 1.25rem 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+}
+
+.project-form-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.project-form-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .project-form-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .project-form-modal__content {
+    width: 100%;
+    max-height: 90vh;
+    padding: 1.25rem;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .project-form-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .project-form-modal__actions .button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ===== Form hapus di kartu AJAX (password + tombol Hapus) ===== */
+.project-delete-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.project-delete-inline__input {
+  width: 8.5rem;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.project-delete-inline__input:focus {
+  outline: 2px solid var(--accent);
+  border-color: var(--accent);
+}

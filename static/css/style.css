@@ -1,5 +1,6 @@
 @import url(components/_navbar.css);
 @import url(components/_footer.css);
+@import url(components/_toast.css);
 @import url(landing/_about-me.css);
 @import url(landing/_experience.css);
 @import url(landing/_projects.css);
@@ -72,4 +73,9 @@ main {
 .btn-small:focus-visible {
   background-color: var(--accent);
   color: var(--bg);
+}
+
+/* Utilitas: sembunyikan elemen (dipakai state loading/error/empty/grid AJAX) */
+.hide {
+  display: none !important;
 }
