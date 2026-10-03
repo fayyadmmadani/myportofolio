@@ -23,6 +23,19 @@ class ExperienceForm(ModelForm):
             "thumbnail": URLInput(attrs={"placeholder": "https://.../thumbnail.png"}),
             "ended_at": DateTimeInput(attrs={"type" : "datetime-local"})
         }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama experience tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_description(self):
+        description = strip_tags(self.cleaned_data["description"]).strip()
+        if not description:
+            raise ValidationError("Deskripsi experience tidak boleh hanya berisi tag HTML.")
+        return description
+
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
