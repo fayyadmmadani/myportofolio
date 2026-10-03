@@ -84,18 +84,24 @@ Akun Editor dapat mengubah data Projects dan Experience, tetapi tidak dapat mena
    python manage.py test
 ```
 
-### Tugas 4
+### Tugas 5
+
+1. Debouncing adalah teknik menunda eksekusi sebuah fungsi sampai event berhenti terjadi selama jeda waktu tertentu. Setiap event baru membatalkan timer sebelumnya (`clearTimeout`) lalu memulai timer baru (`setTimeout`), sehingga fungsi hanya dijalankan sekali setelah pengguna benar-benar berhenti. Teknik ini penting untuk pencarian berbasis AJAX karena tanpa debouncing setiap karakter yang diketik memicu satu request ke server. Mengetik "asisten" berarti tujuh request, padahal hanya hasil terakhir yang dibutuhkan. Akibatnya beban server dan jaringan bertambah, dan respons yang datang tidak berurutan bisa menimpa hasil terbaru dengan hasil lama. Pada halaman Experience, pencarian judul memakai jeda 300 ms dan request lama dibatalkan dengan `AbortController`, sehingga hanya hasil pencarian terbaru yang ditampilkan.
+
+2. `fetch()` bersifat asinkron dan langsung mengembalikan sebuah `Promise`, bukan data responsnya. **`await`** (hanya bisa dipakai di dalam fungsi `async`) membuat eksekusi fungsi menunggu sampai `Promise` tersebut selesai lalu mengembalikan nilainya, sehingga kode asinkron bisa ditulis berurutan seperti kode sinkron dan error bisa ditangkap dengan `try...catch`. Tanpa `await`, variabel akan berisi objek `Promise` yang belum selesai, bukan objek `Response`. Pemanggilan seperti `response.ok` atau `response.json()` akan bernilai `undefined` atau gagal, baris berikutnya langsung berjalan sebelum data tiba, dan error jaringan tidak tertangkap oleh blok `catch` di fungsi tersebut. Contohnya di `fetchExperience`, `await fetch(...)` memastikan status respons diperiksa dulu, lalu `await response.json()` memastikan data sudah ter-parse sebelum kartu dirender.
+
+3. XSS (Cross-Site Scripting) adalah serangan ketika penyerang berhasil menyisipkan kode JavaScript ke halaman web, yang kemudian dijalankan di browser pengguna lain. Pada stored XSS, payload seperti `<img src="x" onerror="alert('XSS!')">` disimpan ke database (misalnya sebagai judul) lalu ikut dieksekusi setiap kali data ditampilkan, sehingga penyerang bisa membaca cookie `csrftoken` dan mengirim request atas nama korban. Template Django aman secara default karena melakukan auto-escaping pada setiap `{{ variabel }}`: karakter `<`, `>`, `&`, `"`, dan `'` diubah menjadi entity sehingga ditampilkan sebagai teks biasa. Saat data ditampilkan lewat AJAX, data JSON disisipkan ke template literal lalu dipasang dengan `innerHTML`, dan proses ini tidak melewati template Django. Browser akan menafsirkan setiap tag HTML di dalam data sebagai kode sungguhan. Karena itu setiap nilai harus di-escape manual (`escapeHtml` atau `textContent`), dan sebagai lapisan tambahan input dibersihkan di server dengan `strip_tags` pada method `clean_<field>` di `ModelForm`.
 
 ### AI Disclosure
 
 Tools: Claude\
 Strategi Prompting:
-- Memberikan dokumen soal Tugas 4 dan meminta analisis selisih antara requirement dengan kondisi repositori saat ini.
-- Mendiskusikan pemetaan pekerjaan per branch (feat/auth, feat/experience, feat/projects) sebelum eksekusi, lalu meminta implementasi per branch dan melakukan review, commit, serta merge sendiri.
-Bagian Spesifik yang dibantu:
-- Perbaikan implementasi Tutorial 4: key context last_login, route toggle_star, komponen tombol star, dan tampilan sesi terakhir login.
-- Cara implementasi peran Editor melalui Django Group menggunakan data migration.
-- Cara memisahkan logika otorisasi ke helper (is_editor, can_edit, can_create_or_delete) agar dipakai bersama oleh Projects dan Experience.
-- Cara menerapkan pembatasan hak akses di sisi server (redirect login dan HTTP 403) serta menyembunyikan tombol aksi sesuai peran di template.
-- Cara membuat halaman 403 custom.
-- Cara menulis unit test untuk hak akses keempat peran, fitur star, dan keamanan endpoint JSON, serta memperbaiki test lama yang gagal.
+- Mendiskusikan keputusan desain sebelum eksekusi: adaptasi field Project yang sudah ada, bagian portofolio yang dikerjakan (Experience, karena Projects sudah dipakai di tutorial), pemetaan branch (`tutorial`, `feat/projects`, `feat/experience`), dan fitur ekstra yang dipilih (filter kategori).
+- Bagaimana memperbaiki masalah setelah mengikuti tutorial: form hapus di kartu AJAX yang tidak mengirim `secret` dan unit test lama yang masih mengecek HTML hasil render Django.
+- Cara memindahkan `escapeHtml` dan `getCookie` ke `static/js/utils.js` agar dipakai bersama oleh Projects dan Experience.
+- Cara mengubah halaman Experience menjadi AJAX: JSON manual dengan `JsonResponse` (termasuk format tanggal di server), state loading/kosong/error, pencarian dengan debouncing, filter kategori, dan modal konfirmasi hapus yang dibuat lewat JavaScript.
+- Cara membuat `create_experience_ajax` dengan `@require_POST`, pengecekan peran di view (`can_create_or_delete`), validasi `ModelForm`, status 201/400/403, dan token CSRF lewat header `X-CSRFToken`.
+- Cara membersihkan input dengan `strip_tags` pada `clean_title` dan `clean_description`.
+- Cara menulis unit test untuk endpoint AJAX (405, 403 per peran, 400, 201), filter pencarian, dan sanitasi XSS.
+Keterbatasan AI yang ditemukan:
+- Untuk evaluasi, AI tidak dapat menguji tampilan dan interaksi di browser secara langsung, sehingga pengujian fungsional di `runserver` tetap dilakukan secara manual.
