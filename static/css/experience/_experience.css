@@ -94,3 +94,21 @@
     justify-content: flex-end;
   }
 }
+
+/* ===== Filter kategori experience (dropdown di baris pencarian) ===== */
+.experience-filter {
+  background-color: var(--bg);
+  cursor: pointer;
+}
+
+.experience-filter option {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+@media (min-width: 768px) {
+  .experience-filter {
+    width: auto;
+    min-width: 11rem;
+  }
+}

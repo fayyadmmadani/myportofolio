@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.exceptions import PermissionDenied  
 from django.http import HttpResponse, JsonResponse
+from django.utils import timezone, translation
+from django.utils.formats import date_format
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -74,32 +76,52 @@ def show_main(request):
 
 
 def show_experience(request):
-    json_response = get_experience_json(request)
-
-    experiences = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    experiences = [experience.object for experience in experiences]
-
     context = {
         "name": "Fayyad Mohammad Madani",
-        "experience_list": experiences,
+        "form": ExperienceForm(),
+        "categories": Experience.EXPERIENCE_CHOICES,
         "is_editor": is_editor(request.user),
     }
     return render(request, "experience.html", context)
 
+def _format_experience_period(experience):
+    """Format rentang waktu experience (locale Indonesia) untuk respons JSON."""
+    with translation.override("id"):
+        started = date_format(timezone.localtime(experience.started_at), "j M Y")
+        if experience.ended_at is None:
+            return f"{started} - sekarang"
+        ended = date_format(timezone.localtime(experience.ended_at), "j M Y")
+        return f"{started} - {ended}"
+
 def get_experience_json(request):
     category_query = request.GET.get("category", "").strip()
+    title_query = request.GET.get("title", "").strip()
     experiences = Experience.objects.all().order_by(
         F("ended_at").desc(nulls_first=True), "-started_at"
     )
-    
+
     if category_query:
         experiences = experiences.filter(category=category_query)
-    
-    experience_json = serializers.serialize("json", experiences)
-    return HttpResponse(experience_json, content_type="application/json")
+    if title_query:
+        experiences = experiences.filter(title__icontains=title_query)
+
+    # Konstruksi data JSON secara manual (hanya field yang dibutuhkan tampilan)
+    data = [
+        {
+            "pk": str(experience.id),
+            "fields": {
+                "title": experience.title,
+                "description": experience.description,
+                "category": experience.category,
+                "category_display": experience.get_category_display(),
+                "thumbnail": experience.thumbnail or "",
+                "is_ongoing": experience.is_ongoing,
+                "period": _format_experience_period(experience),
+            },
+        }
+        for experience in experiences
+    ]
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url="/login/")
 def create_experience(request):
@@ -123,6 +145,30 @@ def create_experience(request):
         "form": form,
     }
     return render(request, "experience_form.html", context)
+
+@require_POST
+def create_experience_ajax(request):
+    # Authorization di sisi server: hanya pemilik portofolio (bukan sekadar
+    # menyembunyikan tombol di template). @login_required tidak dipakai agar
+    # pengunjung mendapat JSON 403, bukan redirect ke halaman login.
+    if not can_create_or_delete(request.user):
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan experience."},
+            status=403,
+        )
+
+    if request.POST.get("secret") != settings.EDIT_SECRET:
+        return JsonResponse({"message": "Password salah!"}, status=403)
+
+    form = ExperienceForm(request.POST)
+    if form.is_valid():
+        experience = form.save()
+        return JsonResponse(
+            {"message": "Experience berhasil ditambahkan.", "pk": str(experience.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 @login_required(login_url="/login/")
 def edit_experience(request, experience_id):
