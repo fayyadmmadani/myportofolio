@@ -331,7 +331,7 @@ class ProjectTest(TestCase):
         # kerangka + endpoint, sedangkan datanya diperiksa lewat API JSON.
         response = self.client.get(reverse("main:show_projects"))
         self.assertContains(response, 'id="grid"')
-        self.assertContains(response, reverse("main:get_projects_json"))
+        self.assertContains(response, reverse("api:project-list"))
 
         data = self.client.get(reverse("main:get_projects_json")).json()
         self.assertEqual(data[0]["fields"]["title"], self.project.title)
