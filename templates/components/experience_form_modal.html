@@ -20,7 +20,6 @@
     <h2 id="add-experience-modal-title">Tambah Experience Baru</h2>
     <form id="experience-form"
           method="post"
-          action="{% url 'main:create_experience' %}"
           class="project-form">
       {% csrf_token %}
       {% for field in form %}
@@ -32,10 +31,6 @@
         {% endfor %}
       </div>
       {% endfor %}
-      <div class="form-group">
-        <label for="experience-secret">Password</label>
-        <input type="password" name="secret" id="experience-secret" required>
-      </div>
       <div class="project-form-modal__actions">
         <button type="button"
                 class="button button-secondary"
