@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import (
     api_view, authentication_classes, permission_classes,
 )
@@ -8,16 +8,24 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from main.models import Project, Experience
-from main.permissions import IsOwnerOrReadOnly, IsOwnerOrEditorOrReadOnly
+from main.permissions import IsPortfolioOwnerOrReadOnly
 from main.serializers import ProjectSerializer, ExperienceSerializer
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def api_logout(request):
+    if request.auth is not None:
+        request.auth.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsOwnerOrEditorOrReadOnly])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsPortfolioOwnerOrReadOnly])
 def experience_list(request):
     if request.method in ("GET", "HEAD"):
-        experiences = Experience.objects.prefetch_related("starred_by").order_by("title", "id")
+        experiences = Experience.objects.prefetch_related("starred_by").order_by("-started_at", "id")
         category = request.query_params.get("category", "").strip()
         title = request.query_params.get("title", "").strip()
         if category:
@@ -34,9 +42,10 @@ def experience_list(request):
     serializer.save()
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsOwnerOrEditorOrReadOnly])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsPortfolioOwnerOrReadOnly])
 def experience_detail(request, experience_id):
     experience = get_object_or_404(
         Experience.objects.prefetch_related("starred_by"), pk=experience_id,
@@ -59,7 +68,7 @@ def experience_detail(request, experience_id):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def experience_star(request, experience_id):
     experience = get_object_or_404(Experience, pk=experience_id)
@@ -70,9 +79,10 @@ def experience_star(request, experience_id):
     serializer = ExperienceSerializer(experience, context={"request": request})
     return Response(serializer.data)
 
+
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsOwnerOrReadOnly])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsPortfolioOwnerOrReadOnly])
 def project_list(request):
     if request.method in ("GET", "HEAD"):
         projects = Project.objects.prefetch_related("starred_by").order_by("title", "id")
@@ -91,8 +101,8 @@ def project_list(request):
 
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsOwnerOrReadOnly])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsPortfolioOwnerOrReadOnly])
 def project_detail(request, project_id):
     project = get_object_or_404(
         Project.objects.prefetch_related("starred_by"), pk=project_id,
@@ -115,7 +125,7 @@ def project_detail(request, project_id):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def project_star(request, project_id):
     project = get_object_or_404(Project, pk=project_id)

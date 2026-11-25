@@ -24,6 +24,9 @@ class IsOwnerOrReadOnly(BasePermission):
         )
 
 
+IsPortfolioOwnerOrReadOnly = IsOwnerOrReadOnly
+
+
 class IsOwnerOrEditorOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
